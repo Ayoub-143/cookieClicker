@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-g++ main.cpp Game.cpp -o MyGame -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
+g++ src/main.cpp src/Game.cpp -o MyGame -lsfml-graphics -lsfml-window -lsfml-audio -lsfml-system
 
 
 # Check if the compilation was successful
