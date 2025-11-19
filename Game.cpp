@@ -50,21 +50,21 @@ Game::Game() {
     window.setFramerateLimit(147);
 
     // Load textures
-    if (!backTexture.loadFromFile("background.png") ||
-        !playerTexture.loadFromFile("player.png") ||
-        !font.loadFromFile("font.ttf")) {
+    if (!backTexture.loadFromFile("assets/background.png") ||
+        !playerTexture.loadFromFile("assets/player.png") ||
+        !font.loadFromFile("assets/font.ttf")) {
         std::cerr << "Missing critical files!\n";
         std::exit(1);
     }
 
     // Upgrade button with fallback red square
-    if (!upgradeTexture.loadFromFile("upgrade.png")) {
+    if (!upgradeTexture.loadFromFile("assets/upgrade.png")) {
         sf::Image img;
         img.create(120, 120, sf::Color(220, 20, 60));
         upgradeTexture.loadFromImage(img);
     }
 
-    if(!grandpaTexture.loadFromFile("grandpa.png")){
+    if(!grandpaTexture.loadFromFile("assets/grandpa.png")){
         sf::Image img1;
         img1.create(120, 120, sf::Color(150, 75, 0));
         grandpaTexture.loadFromImage(img1);
