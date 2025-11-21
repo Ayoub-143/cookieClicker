@@ -16,7 +16,7 @@ void Player::move(double dx, double dy, float dt) {
 }
 
 void Player::triggerBong() {
-    sprite.setScale(0.85f, 0.85f);
+    sprite.setScale(0.50f, 0.50f);
     animClock.restart();
     animating = true;
     animTime = 0.0f;
@@ -43,6 +43,22 @@ Background::Background(const sf::Texture& texture) {
 void UpgradeButton::scaling(const sf::Texture& texture,float scaleX,float scaleY){
     sprite.setTexture(texture);
     sprite.setScale(scaleX, scaleY);
+}
+
+void updatecookies(float deltaTime, int& cookies, UpgradeButton& Grandpa) {
+    static float elapsedTime = 0.0f;  // Static to maintain state between function calls
+    float cookieGenerationInterval = 1.0f;  // 1 second interval
+    
+    elapsedTime += deltaTime;
+    
+    // Check if a full second has passed
+    if (elapsedTime >= cookieGenerationInterval) {
+        // Add cookies based on Grandpa's specific cps increase
+        cookies += Grandpa.cpsIncrease;
+        
+        // Reset the timer
+        elapsedTime -= cookieGenerationInterval;
+    }
 }
 
 // ====================== GAME ======================
@@ -74,13 +90,13 @@ Game::Game() {
     new (&bg) Background(backTexture);
     new (&player) Player(playerTexture);
     new (&upgradeButton) UpgradeButton(upgradeTexture, 10, 1);
-    new (&Grandpa) UpgradeButton(grandpaTexture, 300, 1); 
+    new (&Grandpa) UpgradeButton(grandpaTexture, 300, 0); 
     
 
     player.sprite.setPosition(960, 540);
     upgradeButton.sprite.setPosition(50, 500);
     upgradeButton.sprite.setScale(2.0f, 2.0f);
-    Grandpa.sprite.setPosition(200, 500);
+    Grandpa.sprite.setPosition(50, 300);
     Grandpa.scaling(grandpaTexture,0.4f,0.4f);
 
     // Reset upgrade every launch (for testing)
@@ -89,7 +105,7 @@ Game::Game() {
     upgradeButton.sprite.setColor(sf::Color::White);
 
     // Sound
-    if (clickBuffer.loadFromFile("click.wav")) {
+    if (clickBuffer.loadFromFile("assets/click.wav")) {
         clickSound.setBuffer(clickBuffer);
         clickSound.setVolume(70.f);
     }
@@ -100,7 +116,7 @@ Game::Game() {
     cookieText.setFillColor(sf::Color::White);
     cookieText.setOutlineColor(sf::Color::Black);
     cookieText.setOutlineThickness(3);
-    cookieText.setPosition(760, 50);
+    cookieText.setPosition(570, 50);
 
     fpsText.setFont(font);
     fpsText.setCharacterSize(24);
@@ -135,7 +151,7 @@ void Game::handleEvents() {
             window.close();
         }
 
-        // THE BIG FIX: mapPixelToCoords makes clicks work in ANY window size
+        // THE BIG FIX: mapPixelToCoords makes clicks work in ANY window size  CRAZY
         if (e.type == sf::Event::MouseButtonReleased && e.mouseButton.button == sf::Mouse::Left) {
             sf::Vector2i pixelPos = sf::Mouse::getPosition(window);
             sf::Vector2f worldPos = window.mapPixelToCoords(pixelPos);  // THIS LINE FIXES EVERYTHING
@@ -148,7 +164,7 @@ void Game::handleEvents() {
                     clickSound.play();
             }
 
-            // Click upgrade button — WORKS IN WINDOWED, MAXIMIZED, RESIZED, EVERYTHING
+            // Click upgrade button — WORKS IN WINDOWED, MAXIMIZED, RESIZED, EVERYTHING EVEN FOR THE OTHER BUTTONS, simply GENIUS
             if (upgradeButton.sprite.getGlobalBounds().contains(worldPos)) {
                 if (cookies >= upgradeButton.cost && 100 > costIncrement) {
                     cookies -= upgradeButton.cost;
@@ -158,13 +174,27 @@ void Game::handleEvents() {
                     upText.setString("Upgrade: +" + std::to_string(upgradeButton.cpsIncrease) + " Cookie/Click\nCost:"  + std::to_string(upgradeButton.cost) + " Cookies");
                 }
                 if( 100 <= costIncrement){
-                    upgradeButton.sprite.setColor(sf::Color(80, 80, 80));upgradeButton.purchased = true; upText.setString("Done!");
+                    upgradeButton.sprite.setColor(sf::Color(90, 90, 90));upgradeButton.purchased = true; upText.setString("Done!");
                 }
                 
             }
 
+            if( Grandpa.sprite.getGlobalBounds().contains(worldPos)) {
+                if (cookies >= Grandpa.cost && 250 > gCostIncrement) {
+                    cookies -= Grandpa.cost;
+                    Grandpa.cpsIncrease += 3;
+                    Grandpa.cost += gCostIncrement;
+                    gCostIncrement += 20;
+                    upText.setString("Upgrade: +" + std::to_string(Grandpa.cpsIncrease) + " Cookie/Click\nCost:"  + std::to_string(Grandpa.cost) + " Cookies");
+                    
+                }
+                if(250 <= gCostIncrement){
+                    Grandpa.sprite.setColor(sf::Color(80, 80, 80));Grandpa.purchased = true; upText.setString("Done!");
+                }
+
         }
     }
+}
 }
 
 void Game::update(float dt) {
@@ -197,6 +227,13 @@ void Game::update(float dt) {
         frameCount = 0;
         fpsTimer = 0;
     }
+
+    //granpa cookies per second
+    // In your game loop or update method
+    updatecookies(dt, cookies, Grandpa);
+
+    
+
 
     // Auto-save
     if (saveTimer.getElapsedTime().asSeconds() >= 25.0f) {

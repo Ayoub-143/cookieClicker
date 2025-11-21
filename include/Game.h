@@ -76,6 +76,9 @@ private:
     int cookies = 0;
     int cookiesPerClick = 1;
     int costIncrement = 10;
+    int gCostIncrement = 20;
+    float elapsedTime = 0.0f;  // Track elapsed time
+    float cookieGenerationInterval = 1.0f;  // 1 second interval
 
     sf::Clock clock;
     sf::Clock saveTimer;
