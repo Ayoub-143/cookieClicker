@@ -116,7 +116,7 @@ Game::Game() {
     cookieText.setFillColor(sf::Color::White);
     cookieText.setOutlineColor(sf::Color::Black);
     cookieText.setOutlineThickness(3);
-    cookieText.setPosition(570, 50);
+    cookieText.setPosition(570, 51);
 
     fpsText.setFont(font);
     fpsText.setCharacterSize(24);
